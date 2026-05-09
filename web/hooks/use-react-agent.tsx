@@ -10,6 +10,7 @@ import type {
 import { toTextContentPart } from "@/lib/types"
 import type { StreamedReactContentPart } from "@/lib/ai/react"
 import { McpServer } from "@/lib/ai/tools"
+import { McpServers } from "@/lib/constants"
 
 export type ReactAgentStatus = "idle" | "streaming" | "error"
 
@@ -55,273 +56,18 @@ function appendText(
   return [...content, toTextContentPart(text)]
 }
 
-const mockMessages: UIMessage[] = [
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "1",
-    role: "user",
-    parts: [
-      {
-        type: "text",
-        content: {
-          text: "What is in this image?",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-  {
-    id: "2",
-    role: "assistant",
-    parts: [
-      {
-        type: "tool_invocation",
-        content: {
-          state: "result",
-          tool_call_id: "1234",
-          tool_name: "describe_image",
-          args: { image_url: "https://example.com/cat.jpg" },
-          result: { description: "A cat sitting on a windowsill." },
-        },
-      },
-      {
-        type: "text",
-        content: {
-          text: "This is an image of a cat sitting on a windowsill.",
-        },
-      },
-    ],
-    timestamp: new Date(),
-  },
-]
-
 export function ReactAgentProvider({
   children,
-  systemPrompt,
 }: {
   children: React.ReactNode
-  systemPrompt?: string
 }) {
   const availableModels = ["claude-sonnet-4-6", "gpt-4o", "gpt-3.5-turbo"]
   const [messages, setMessages] = useState<UIMessage[]>([])
   const [status, setStatus] = useState<ReactAgentStatus>("idle")
   const [selectedModel, setSelectedModel] = useState(availableModels[0])
-  const [selectedServers, setSelectedServers] = useState<string[]>([])
+  const [selectedServers, setSelectedServers] = useState<string[]>([
+    McpServers[0].name,
+  ])
   const abortRef = useRef<AbortController | null>(null)
 
   const invoke = async (input: string) => {
@@ -331,15 +77,15 @@ export function ReactAgentProvider({
     const assistantMessage = newUIMessage("assistant")
     const assistantId = assistantMessage.id
 
-    setMessages((prev) => [...prev, userMessage, assistantMessage])
-    setStatus("streaming")
-
-    abortRef.current = new AbortController()
     const req: InvokeAgentRequest = {
       messages: [...messages, userMessage],
       model: selectedModel,
-      servers: selectedServers,
+      activeMcps: selectedServers,
     }
+
+    setMessages((prev) => [...prev, userMessage, assistantMessage])
+    setStatus("streaming")
+    abortRef.current = new AbortController()
     await fetchEventSource("/api/react-agent", {
       method: "POST",
       headers: { "Content-Type": "application/json" },

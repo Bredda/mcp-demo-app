@@ -6,12 +6,28 @@ import equal from "fast-deep-equal"
 import { Markdown } from "./markdown"
 import { CopyButton } from "./copy-button"
 import { ToolInvocation } from "./tool-invocation"
+import { useTypewriter } from "@/hooks/use-typewriter"
 
 type ChatMessageProps = {
   message: Message
   isLatestMessage: boolean
   isLoading: boolean
   status: ReactAgentStatus
+}
+
+function AssistantTextPart({
+  text,
+  isStreaming,
+}: {
+  text: string
+  isStreaming: boolean
+}) {
+  const animated = useTypewriter(text)
+  return (
+    <div className="prose prose-sm dark:prose-invert">
+      <Markdown>{isStreaming ? animated : text}</Markdown>
+    </div>
+  )
 }
 
 const PurePreviewMessage = ({
@@ -59,7 +75,14 @@ const PurePreviewMessage = ({
                           message.role === "user",
                       })}
                     >
-                      <Markdown>{part.content.text}</Markdown>
+                      <AssistantTextPart
+                        text={part.content.text}
+                        isStreaming={
+                          message.role === "assistant" &&
+                          isLatestMessage &&
+                          status === "streaming"
+                        }
+                      />
                     </div>
                   </div>
                 )

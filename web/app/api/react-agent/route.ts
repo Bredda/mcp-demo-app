@@ -16,16 +16,26 @@ function sse(event: string, data: unknown) {
 }
 
 export async function POST(req: NextRequest) {
-  const { messages, model, servers }: InvokeAgentRequest = await req.json()
+  const { messages, model, activeMcps }: InvokeAgentRequest = await req.json()
+  console.log("Received POST request with body:", {
+    messages,
+    model,
+    activeMcps,
+  })
   let tools: DynamicStructuredTool[] = []
   try {
-    tools = await getMcpTools(servers)
+    tools = await getMcpTools(activeMcps)
+    console.log(
+      `Fetched ${tools.length} tools for active MCPs:`,
+      tools.map((t) => t.name).join(", ")
+    )
   } catch (error) {
     console.error("Error fetching MCP tools:", error)
     throw new Error("Failed to fetch MCP tools")
   }
 
   const lcMessages = toLangChainMessages(messages)
+  console.log("Converted messages to LangChain format:", lcMessages)
 
   const body = new ReadableStream({
     async start(controller) {

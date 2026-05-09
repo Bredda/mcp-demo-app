@@ -1,7 +1,7 @@
 export type InvokeAgentRequest = {
   messages: Message[]
   model: string
-  servers: string[]
+  activeMcps: string[]
 }
 
 export type TextContentPart = {

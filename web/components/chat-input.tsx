@@ -20,17 +20,11 @@ import React from "react"
 import { useReactAgent } from "@/hooks/use-react-agent"
 import { McpPicker } from "./mcp-picker"
 
-interface ChatInput {
-  isLoading: boolean
-  status: string
-  stop: () => void
-}
-
-export function ChatInput({ isLoading, status, stop }: ChatInput) {
-  const [input, setInput] = React.useState("")
-  const isStreaming = status === "streaming" || status === "submitted"
-  const { availableModels, invoke, selectedModel, setSelectedModel } =
+export function ChatInput() {
+  const { availableModels, status, invoke, selectedModel, setSelectedModel } =
     useReactAgent()
+  const [input, setInput] = React.useState("")
+  const isStreaming = status === "streaming"
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -52,7 +46,7 @@ export function ChatInput({ isLoading, status, stop }: ChatInput) {
             if (
               e.key === "Enter" &&
               !e.shiftKey &&
-              !isLoading &&
+              !isStreaming &&
               input.trim()
             ) {
               handleSubmit(e)
@@ -80,10 +74,7 @@ export function ChatInput({ isLoading, status, stop }: ChatInput) {
             className="ml-auto"
             type={isStreaming ? "button" : "submit"}
             onClick={isStreaming ? stop : handleSubmit}
-            disabled={
-              (!isStreaming && !input.trim()) ||
-              (isStreaming && status === "submitted")
-            }
+            disabled={(!isStreaming && !input.trim()) || isStreaming}
           >
             {isStreaming ? (
               <Spinner className="h-4 w-4 text-primary-foreground" />

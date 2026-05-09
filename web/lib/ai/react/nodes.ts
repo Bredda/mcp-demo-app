@@ -1,8 +1,16 @@
 import { ConditionalEdgeRouter, END, GraphNode } from "@langchain/langgraph"
 import { AgentState, AgentContext } from "./state"
 import { buildLlm } from "../llm"
-import { AIMessage, AIMessageChunk, ToolMessage } from "@langchain/core/messages"
-import { toTextContentPart, toToolInvocationPart, toToolResultPart } from "@/lib/types"
+import {
+  AIMessage,
+  AIMessageChunk,
+  ToolMessage,
+} from "@langchain/core/messages"
+import {
+  toTextContentPart,
+  toToolInvocationPart,
+  toToolResultPart,
+} from "@/lib/types"
 
 /**
  * Agent node for handling LLM interactions
@@ -18,6 +26,9 @@ export const agent: GraphNode<AgentState, AgentContext> = async (
   state,
   context
 ) => {
+  console.log(
+    `Agent node received ${context.configurable?.tools?.length ?? 0} tools in context.`
+  )
   const llm = buildLlm(context.configurable?.model!)
   const llmWithTools = llm.bindTools(context.configurable?.tools || [])
   const stream = await llmWithTools.stream([
@@ -31,7 +42,9 @@ export const agent: GraphNode<AgentState, AgentContext> = async (
   let fullResponse: AIMessageChunk | undefined = undefined
   for await (const chunk of stream) {
     fullResponse = fullResponse ? fullResponse.concat(chunk) : chunk
-    context.writer!({ part: toTextContentPart(chunk.text), source: "agent" })
+    if (chunk.text) {
+      context.writer!({ part: toTextContentPart(chunk.text), source: "agent" })
+    }
   }
   return {
     messages: [fullResponse ?? new AIMessageChunk({ content: "" })],
@@ -56,24 +69,37 @@ export const toolNode: GraphNode<AgentState, AgentContext> = async (
 
   if (
     !lastMessage ||
-    !(lastMessage instanceof AIMessage) ||
+    (!(lastMessage instanceof AIMessage) && !(lastMessage instanceof AIMessageChunk)) ||
     !lastMessage.tool_calls?.length
   ) {
     return { messages: [] }
   }
   const toolMessages = await Promise.all(
     lastMessage.tool_calls.map(async (toolCall) => {
-      context.writer!({ part: toToolInvocationPart(toolCall), source: "toolNode" })
-      const tool = context.configurable?.tools.find((t) => t.name === toolCall.name)
+      context.writer!({
+        part: toToolInvocationPart(toolCall),
+        source: "toolNode",
+      })
+      const tool = context.configurable?.tools.find(
+        (t) => t.name === toolCall.name
+      )
       let content: string
       try {
-        const rawResult = (await tool?.invoke(toolCall.args)) ?? "Tool not found"
-        content = typeof rawResult === "string" ? rawResult : JSON.stringify(rawResult)
+        const rawResult =
+          (await tool?.invoke(toolCall.args)) ?? "Tool not found"
+        content =
+          typeof rawResult === "string" ? rawResult : JSON.stringify(rawResult)
       } catch (err) {
         content = `Tool error: ${err instanceof Error ? err.message : String(err)}`
       }
-      const toolMessage = new ToolMessage({ content, tool_call_id: toolCall.id ?? "" })
-      context.writer!({ part: toToolResultPart(toolCall, content), source: "toolNode" })
+      const toolMessage = new ToolMessage({
+        content,
+        tool_call_id: toolCall.id ?? "",
+      })
+      context.writer!({
+        part: toToolResultPart(toolCall, content),
+        source: "toolNode",
+      })
       return toolMessage
     })
   )
@@ -86,10 +112,13 @@ export const shouldContinue: ConditionalEdgeRouter<
   "toolNode" | "__end__"
 > = (state) => {
   const lastMessage = state.messages.at(-1)
+  console.log("Routing decision based on last message:", lastMessage)
   // If the LLM makes a tool call, then route to the tool node
-  if (lastMessage instanceof AIMessage && lastMessage.tool_calls?.length) {
+  if (lastMessage instanceof AIMessageChunk && lastMessage.tool_calls?.length) {
+    console.log("Routing to toolNode")
     return "toolNode"
   }
   // Otherwise, we stop (reply to the user)
+  console.log("Routing to END")
   return END
 }

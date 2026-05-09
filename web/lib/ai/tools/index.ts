@@ -53,6 +53,9 @@ const getMcpServerConfig = (
 }
 
 export const getMcpTools = async (serverNames: string[]) => {
+  if (serverNames.length === 0) {
+    return []
+  }
   const config = getMcpServerConfig(serverNames)
   const client = new MultiServerMCPClient(config)
   const tools = await client.getTools()

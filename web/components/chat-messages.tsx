@@ -1,0 +1,35 @@
+import { ReactAgentStatus } from "@/hooks/use-react-agent"
+import { useScrollToBottom } from "@/hooks/use-scroll-to-bottom"
+import { Message } from "@/lib/types"
+import { ChatMessage } from "./chat-message"
+
+interface ChatMessagesProps {
+  messages: Array<any>
+  isLoading: boolean
+  status: ReactAgentStatus
+}
+
+export const ChatMessages = ({
+  messages,
+  isLoading,
+  status,
+}: ChatMessagesProps) => {
+  const [containerRef, endRef] = useScrollToBottom()
+
+  return (
+    <div className="no-scrollbar h-full overflow-y-auto" ref={containerRef}>
+      <div className="mx-auto max-w-lg py-4 sm:max-w-3xl">
+        {messages.map((m, i) => (
+          <ChatMessage
+            key={i}
+            isLatestMessage={i === messages.length - 1}
+            isLoading={isLoading}
+            message={m}
+            status={status}
+          />
+        ))}
+        <div className="h-1" ref={endRef} />
+      </div>
+    </div>
+  )
+}

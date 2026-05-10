@@ -1,3 +1,5 @@
+"use client"
+
 import { AddSquareIcon } from "@hugeicons/core-free-icons"
 import { HugeiconsIcon } from "@hugeicons/react"
 import {
@@ -6,18 +8,17 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
 } from "../ui/sidebar"
-import Link from "next/link"
+import { useReactAgent } from "@/hooks/use-react-agent"
 
 export function NavNewThread() {
+  const { newThread } = useReactAgent()
   return (
     <SidebarGroup>
       <SidebarMenu>
         <SidebarMenuItem>
-          <SidebarMenuButton asChild>
-            <Link href="/">
-              <HugeiconsIcon icon={AddSquareIcon} />
-              <span>New Thread</span>
-            </Link>
+          <SidebarMenuButton onClick={newThread}>
+            <HugeiconsIcon icon={AddSquareIcon} />
+            <span>New Thread</span>
           </SidebarMenuButton>
         </SidebarMenuItem>
       </SidebarMenu>

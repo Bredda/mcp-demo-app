@@ -11,9 +11,9 @@ import { AppHeader } from "@/components/layout/app-header"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "MCP-UI Playground",
+  title: "MCP-App Demo",
   description:
-    "MCP-UI Playground enables you to experiment with your MCP-UI servers",
+    "MCP App Demo is a web application showcasing the integration of Modular Control Protocol (MCP) with a React-based agent. It demonstrates how to create a dynamic and interactive user interface that allows users to communicate with an AI agent, which can utilize various tools and resources defined by MCP servers. The application features a chat interface where users can send messages and receive responses from the agent, as well as select different models and active MCP servers to customize their experience.",
 }
 
 export default function RootLayout({

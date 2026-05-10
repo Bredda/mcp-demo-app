@@ -2,14 +2,12 @@
 
 import {
   MoreHorizontalSquare01Icon,
-  Edit02Icon,
   Delete02Icon,
 } from "@hugeicons/core-free-icons"
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import {
@@ -22,21 +20,25 @@ import {
 } from "../ui/sidebar"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { HugeiconsIcon } from "@hugeicons/react"
-
-const threads: any[] = [{ id: "1", name: "Test" }]
+import { useReactAgent } from "@/hooks/use-react-agent"
 
 export default function NavThreads() {
   const isMobile = useIsMobile()
+  const { threads, currentThreadId, loadThread, deleteThread } = useReactAgent()
+
+  if (threads.length === 0) return null
+
   return (
     <SidebarGroup className="group-data-[collapsible=icon]:hidden">
       <SidebarGroupLabel>Threads</SidebarGroupLabel>
       <SidebarMenu>
-        {threads.map((item) => (
-          <SidebarMenuItem key={item.id}>
-            <SidebarMenuButton asChild>
-              <a href={item.id}>
-                <span>{item.name}</span>
-              </a>
+        {threads.map((thread) => (
+          <SidebarMenuItem key={thread.id}>
+            <SidebarMenuButton
+              isActive={thread.id === currentThreadId}
+              onClick={() => loadThread(thread.id)}
+            >
+              <span className="truncate">{thread.title}</span>
             </SidebarMenuButton>
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
@@ -50,17 +52,13 @@ export default function NavThreads() {
                 side={isMobile ? "bottom" : "right"}
                 align={isMobile ? "end" : "start"}
               >
-                <DropdownMenuItem>
-                  <HugeiconsIcon
-                    icon={Edit02Icon}
-                    className="text-muted-foreground"
-                  />
-                  <span>Rename</span>
-                </DropdownMenuItem>
-                <DropdownMenuItem>
+                <DropdownMenuItem
+                  className="text-destructive"
+                  onClick={() => deleteThread(thread.id)}
+                >
                   <HugeiconsIcon
                     icon={Delete02Icon}
-                    className="text-muted-foreground"
+                    className="text-destructive"
                   />
                   <span>Delete</span>
                 </DropdownMenuItem>

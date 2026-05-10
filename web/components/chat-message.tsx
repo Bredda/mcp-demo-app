@@ -7,6 +7,7 @@ import { Markdown } from "./markdown"
 import { CopyButton } from "./copy-button"
 import { ToolInvocation } from "./tool-invocation"
 import { useTypewriter } from "@/hooks/use-typewriter"
+import { WebSearchInvocation } from "./tool-invocation/web-search"
 
 type ChatMessageProps = {
   message: Message
@@ -90,9 +91,8 @@ const PurePreviewMessage = ({
                 const { tool_name, state, args } = part.content
                 const result =
                   "result" in part.content ? part.content.result : null
-
                 return (
-                  <ToolInvocation
+                  <WebSearchInvocation
                     key={`message-part-${i}`}
                     toolName={tool_name}
                     state={state}

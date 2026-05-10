@@ -60,13 +60,14 @@ export const ToolInvocation = memo(function ToolInvocation({
   >([])
 
   return (
-    <Accordion type="single" collapsible defaultValue="item-1">
+    <Accordion type="single" collapsible>
       <AccordionItem value="item-1">
         <AccordionTrigger className="cursor-pointer text-muted-foreground hover:text-foreground hover:no-underline">
           {toolName}
         </AccordionTrigger>
         <AccordionContent>
-          Yes. It adheres to the WAI-ARIA design pattern.
+          <div>{JSON.stringify(args)}</div>
+          <div>{JSON.stringify(result)}</div>
         </AccordionContent>
       </AccordionItem>
     </Accordion>

@@ -1,9 +1,8 @@
-import { ArrowUp, SentIcon } from "@hugeicons/core-free-icons"
+import { SentIcon } from "@hugeicons/core-free-icons"
 import {
   InputGroup,
   InputGroupTextarea,
   InputGroupAddon,
-  InputGroupText,
   InputGroupButton,
 } from "./ui/input-group"
 import {

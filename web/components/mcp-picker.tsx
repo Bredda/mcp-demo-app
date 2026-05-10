@@ -29,7 +29,7 @@ export function McpPicker() {
       value={selectedServers}
       onValueChange={setSelectedServers}
     >
-      <ComboboxChips ref={anchor} className="max-w-xs">
+      <ComboboxChips ref={anchor} className="w-fit">
         <ComboboxValue>
           {(values) => (
             <React.Fragment>
